@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QEC Club Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script defer src="data.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <div class="noise"></div>
+    <header class="site-header">
+      <div class="logo">QEC<span>Lab</span></div>
+      <nav>
+        <a href="#du-an">Dự án</a>
+        <a href="projects.html">Kho bài viết</a>
+        <a href="#tham-gia">Tham gia</a>
+        <a href="#lien-he">Liên hệ</a>
+      </nav>
+      <button class="cta ghost" id="themeToggle" aria-label="Đổi giao diện">
+        🌙
+      </button>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero__content">
+          <p class="eyebrow">Câu lạc bộ Công nghệ QEC</p>
+          <h1>
+            Kết nối <span class="gradient-text">ý tưởng</span> và biến chúng thành
+            <span class="gradient-text">dự án thực tế</span>.
+          </h1>
+          <p class="lead">
+            Không gian sáng tạo dành cho các bạn trẻ yêu thích công nghệ, nơi mọi
+            người cùng học tập, chia sẻ và xây dựng những sản phẩm có ảnh hưởng
+            tích cực cho cộng đồng sinh viên.
+          </p>
+          <div class="hero__actions">
+            <a class="cta" href="#du-an">Khám phá dự án</a>
+            <a class="cta ghost" href="#tham-gia">Đăng ký thành viên</a>
+            <a class="cta ghost" href="projects.html">Xem kho bài viết</a>
+          </div>
+          <ul class="metrics">
+            <li>
+              <span>24</span>
+              Dự án đang triển khai
+            </li>
+            <li>
+              <span>120+</span>
+              Thành viên chủ động
+            </li>
+            <li>
+              <span>12</span>
+              Đối tác chiến lược
+            </li>
+          </ul>
+        </div>
+        <div class="hero__panel">
+          <div class="glass card" id="profileCard">
+            <div class="profile">
+              <img src="https://avatars.githubusercontent.com/u/9919" alt="avatar" id="profileAvatar" />
+              <div>
+                <p id="profileName">Khách tham quan</p>
+                <small id="profileEmail">Hãy đăng nhập để cùng sáng tạo</small>
+              </div>
+            </div>
+            <div id="googleSection">
+              <div id="g_id_onload"
+                   data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                   data-context="signin"
+                   data-ux_mode="popup"
+                   data-callback="handleGoogleCredentialResponse"
+                   data-auto_prompt="false">
+              </div>
+              <div class="g_id_signin"
+                   data-type="standard"
+                   data-size="large"
+                   data-theme="outline"
+                   data-shape="pill"
+                   data-text="signin_with"
+                   data-logo_alignment="left">
+              </div>
+              <button class="cta ghost" id="demoLogin">Thử đăng nhập demo</button>
+              <p class="note">Thay client ID bằng ID của CLB để kích hoạt đăng nhập Google.</p>
+            </div>
+          </div>
+          <div class="glass schedule">
+            <h3>Lịch hoạt động tuần này</h3>
+            <ul>
+              <li>
+                <span>Thứ 3</span>
+                Workshop "AI cho sinh viên" – 19h
+              </li>
+              <li>
+                <span>Thứ 5</span>
+                Sprint dự án App CLB – 20h
+              </li>
+              <li>
+                <span>Thứ 7</span>
+                Trình diễn sản phẩm tháng 6 – 9h
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="projects" id="du-an">
+        <div class="section-heading">
+          <p class="eyebrow">Studio dự án</p>
+          <div>
+            <h2>Dự án nổi bật</h2>
+            <p>Danh sách được cập nhật tự động từ form nội bộ của thành viên.</p>
+          </div>
+          <div class="filters">
+            <button class="filter-btn active" data-filter="all">Tất cả</button>
+            <button class="filter-btn" data-filter="web">Web</button>
+            <button class="filter-btn" data-filter="mobile">Mobile</button>
+            <button class="filter-btn" data-filter="ai">AI</button>
+          </div>
+        </div>
+        <div class="project-grid" id="projectGrid"></div>
+      </section>
+
+      <section class="submission" id="tham-gia">
+        <div class="section-heading">
+          <p class="eyebrow">Đăng dự án</p>
+          <div>
+            <h2>Gửi sản phẩm mới</h2>
+            <p>Chỉ thành viên đã đăng nhập bằng Google CLB mới có thể gửi dự án.</p>
+          </div>
+        </div>
+        <form class="glass" id="projectForm">
+          <label>
+            Tên dự án
+            <input type="text" name="title" placeholder="Ví dụ: QEC Portfolio" required />
+          </label>
+          <label>
+            Mô tả ngắn
+            <textarea name="description" rows="3" placeholder="Dự án giải quyết vấn đề gì?" required></textarea>
+          </label>
+          <label>
+            Nhãn (tối đa 3 nhãn, cách nhau bằng dấu phẩy)
+            <input type="text" name="tags" placeholder="web, ux, ai" required />
+          </label>
+          <label>
+            Liên kết demo hoặc Github
+            <input type="url" name="link" placeholder="https://" required />
+          </label>
+          <label>
+            Ảnh minh hoạ (tùy chọn)
+            <input type="url" name="image" placeholder="https://" />
+          </label>
+          <button type="submit" class="cta" disabled>Gửi dự án</button>
+        </form>
+      </section>
+
+      <section class="contact" id="lien-he">
+        <div class="glass">
+          <h3>Cần hợp tác?</h3>
+          <p>
+            Chúng tôi luôn mở rộng hợp tác với doanh nghiệp, tổ chức xã hội và các CLB bạn.
+            Liên hệ trực tiếp qua email <a href="mailto:hello@qec.club">hello@qec.club</a> để trao đổi.
+          </p>
+          <div class="contact__grid">
+            <div>
+              <h4>Mentor</h4>
+              <p>Đội ngũ mentor gồm 8 chuyên gia từ các công ty công nghệ hàng đầu.</p>
+            </div>
+            <div>
+              <h4>Cộng đồng</h4>
+              <p>Hơn 1.200 sinh viên đã tham gia workshop và chương trình mở của CLB.</p>
+            </div>
+            <div>
+              <h4>Không gian</h4>
+              <p>Studio QEC mở cửa 6 ngày/tuần tại Innovation Hub, tầng 4 nhà E.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>© 2024 QEC Lab. Built with tình yêu công nghệ.</p>
+    </footer>
+  </body>
+</html>
