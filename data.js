@@ -1,4 +1,10 @@
-(function (global) {
+(function (global, factory) {
+  if (typeof module === "object" && typeof module.exports !== "undefined") {
+    module.exports = factory();
+  } else {
+    global.QEC_DATA = factory();
+  }
+})(typeof self !== "undefined" ? self : this, function () {
   const STORAGE_KEYS = {
     projects: "qec-projects",
     user: "qec-user",
@@ -154,11 +160,11 @@
     return JSON.parse(JSON.stringify(project));
   }
 
-  global.QEC_DATA = {
+  return {
     STORAGE_KEYS,
     getStarterProjects() {
       return starterProjects.map(clone);
     },
     slugify,
   };
-})(window);
+});

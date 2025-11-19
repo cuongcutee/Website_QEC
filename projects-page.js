@@ -3,25 +3,73 @@ const starterProjects = dataStore.getStarterProjects();
 const STORAGE_KEYS = dataStore.STORAGE_KEYS;
 const slugify = dataStore.slugify;
 
+const API_BASE = "/api";
+
 const heroEl = document.getElementById("projectHero");
 const guideEl = document.getElementById("guideContainer");
 const sidebarEl = document.getElementById("projectSidebar");
 const timelineEl = document.getElementById("projectTimeline");
 
-const projects = loadProjects();
-const sortedProjects = sortProjects(projects);
-const activeProject = getActiveProject(sortedProjects);
+const state = {
+  projects: [],
+};
 
-renderHero(activeProject);
-renderGuide(activeProject);
-renderSidebar(sortedProjects, activeProject?.slug);
-renderTimeline(sortedProjects, activeProject?.slug);
+renderLoadingStates();
+initPage();
 
-document.title = activeProject
-  ? `${activeProject.title} · Kho dự án QEC`
-  : "Kho dự án QEC";
+async function initPage() {
+  await hydrateProjects();
+  const sortedProjects = sortProjects(state.projects);
+  const activeProject = getActiveProject(sortedProjects);
 
-function loadProjects() {
+  renderHero(activeProject);
+  renderGuide(activeProject);
+  renderSidebar(sortedProjects, activeProject?.slug);
+  renderTimeline(sortedProjects, activeProject?.slug);
+
+  document.title = activeProject
+    ? `${activeProject.title} · Kho dự án QEC`
+    : "Kho dự án QEC";
+}
+
+async function hydrateProjects() {
+  try {
+    const response = await fetch(`${API_BASE}/projects`);
+    if (!response.ok) throw new Error("Không thể tải dữ liệu từ backend");
+    const data = await response.json();
+    state.projects = normalizeProjects(data);
+    cacheProjects(state.projects);
+  } catch (error) {
+    console.warn("Không thể kết nối backend, dùng dữ liệu cache", error);
+    state.projects = loadProjectsFromCache();
+  }
+}
+
+function cacheProjects(projectsList) {
+  localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(projectsList));
+}
+
+function renderLoadingStates() {
+  if (heroEl) {
+    heroEl.innerHTML = `
+      <div class="glass">
+        <p class="eyebrow">Kho dự án QEC</p>
+        <h1>Đang tải dữ liệu...</h1>
+        <p class="lead">Vui lòng chờ trong giây lát.</p>
+      </div>`;
+  }
+  if (guideEl) {
+    guideEl.innerHTML = "";
+  }
+  if (sidebarEl) {
+    sidebarEl.innerHTML = `<div class="glass"><p>Đang tải...</p></div>`;
+  }
+  if (timelineEl) {
+    timelineEl.innerHTML = "";
+  }
+}
+
+function loadProjectsFromCache() {
   const cached = localStorage.getItem(STORAGE_KEYS.projects);
   if (!cached) {
     localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(starterProjects));
@@ -164,6 +212,10 @@ function renderResources(resources = []) {
 
 function renderSidebar(projectsList, activeSlug) {
   if (!sidebarEl) return;
+  if (!projectsList.length) {
+    sidebarEl.innerHTML = `<div class="glass"><p>Chưa có dự án nào để hiển thị.</p></div>`;
+    return;
+  }
   sidebarEl.innerHTML = `
     <h3>Bài viết dự án</h3>
     <ul>
@@ -184,6 +236,14 @@ function renderSidebar(projectsList, activeSlug) {
 
 function renderTimeline(projectsList, activeSlug) {
   if (!timelineEl) return;
+  if (!projectsList.length) {
+    timelineEl.innerHTML = `
+      <div class="section-heading">
+        <h2>Chưa có dữ liệu</h2>
+        <p>Gửi dự án mới để thấy lịch trình cập nhật.</p>
+      </div>`;
+    return;
+  }
   timelineEl.innerHTML = `
     <div class="section-heading">
       <p class="eyebrow">Kho bài viết</p>

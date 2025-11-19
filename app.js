@@ -3,6 +3,8 @@ const starterProjects = dataModule.getStarterProjects();
 const STORAGE_KEYS = dataModule.STORAGE_KEYS;
 const slugify = dataModule.slugify;
 
+const API_BASE = "/api";
+
 const projectGrid = document.getElementById("projectGrid");
 const filterButtons = document.querySelectorAll(".filter-btn");
 const form = document.getElementById("projectForm");
@@ -14,12 +16,13 @@ const themeToggle = document.getElementById("themeToggle");
 const demoLoginBtn = document.getElementById("demoLogin");
 
 const state = {
-  projects: loadProjects(),
+  projects: [],
   user: loadUser(),
   filter: "all",
+  loadingProjects: true,
 };
 
-function loadProjects() {
+function loadProjectsFromCache() {
   const cached = localStorage.getItem(STORAGE_KEYS.projects);
   if (!cached) {
     localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(starterProjects));
@@ -51,6 +54,31 @@ function normalizeProjects(projects) {
 
 function saveProjects(projects) {
   localStorage.setItem(STORAGE_KEYS.projects, JSON.stringify(projects));
+}
+
+async function fetchProjectsFromApi() {
+  const response = await fetch(`${API_BASE}/projects`);
+  if (!response.ok) {
+    throw new Error("Không thể tải dữ liệu từ máy chủ");
+  }
+  return response.json();
+}
+
+async function refreshProjects() {
+  if (!projectGrid) return;
+  state.loadingProjects = true;
+  renderProjects();
+  try {
+    const remoteProjects = await fetchProjectsFromApi();
+    state.projects = normalizeProjects(remoteProjects);
+    saveProjects(state.projects);
+  } catch (error) {
+    console.warn("Không thể đồng bộ backend, dùng dữ liệu cache.", error);
+    state.projects = loadProjectsFromCache();
+  } finally {
+    state.loadingProjects = false;
+    renderProjects();
+  }
 }
 
 function loadUser() {
@@ -90,6 +118,11 @@ function parseJwt(token) {
 
 function renderProjects() {
   if (!projectGrid) return;
+  if (state.loadingProjects) {
+    projectGrid.innerHTML = `<p class="note">Đang tải dữ liệu dự án...</p>`;
+    return;
+  }
+
   const projects =
     state.filter === "all"
       ? state.projects
@@ -171,13 +204,13 @@ if (demoLoginBtn) {
 }
 
 if (form) {
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!state.user) return alert("Hãy đăng nhập bằng Google trước khi gửi dự án");
 
     const formData = new FormData(form);
     const title = formData.get("title").trim();
-    const newProject = {
+    const payload = {
       title,
       description: formData.get("description").trim(),
       tags: formData
@@ -190,17 +223,49 @@ if (form) {
       link: formData.get("link").trim(),
       image: formData.get("image").trim(),
       author: state.user.name,
-      createdAt: new Date().toISOString(),
-      publishedAt: new Date().toISOString().split("T")[0],
-      slug: createUniqueSlug(title),
-      guide: null,
     };
 
-    state.projects = [newProject, ...state.projects];
-    saveProjects(state.projects);
-    renderProjects();
-    form.reset();
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Đang gửi...";
+      const saved = await createProjectOnServer(payload);
+      state.projects = [normalizeProjects([saved])[0], ...state.projects];
+      saveProjects(state.projects);
+      renderProjects();
+      form.reset();
+    } catch (error) {
+      console.warn("Không thể gửi dữ liệu tới backend", error);
+      const fallback = {
+        ...payload,
+        slug: createUniqueSlug(title),
+        guide: null,
+        createdAt: new Date().toISOString(),
+        publishedAt: new Date().toISOString().split("T")[0],
+      };
+      state.projects = [fallback, ...state.projects];
+      saveProjects(state.projects);
+      renderProjects();
+      alert("Không thể kết nối máy chủ, dự án được lưu tạm trên trình duyệt.");
+    } finally {
+      submitBtn.disabled = !state.user;
+      submitBtn.textContent = state.user ? "Gửi dự án" : "Đăng nhập để gửi";
+    }
   });
+}
+
+async function createProjectOnServer(project) {
+  const response = await fetch(`${API_BASE}/projects`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(project),
+  });
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || "Không thể tạo dự án mới");
+  }
+  return response.json();
 }
 
 function createUniqueSlug(title) {
@@ -250,6 +315,10 @@ if (themeToggle) {
   themeToggle.addEventListener("click", toggleTheme);
 }
 
-initTheme();
-renderProjects();
-updateProfileUI();
+async function bootstrap() {
+  initTheme();
+  updateProfileUI();
+  await refreshProjects();
+}
+
+bootstrap();

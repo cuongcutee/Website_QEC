@@ -1,0 +1,13 @@
+{
+  "name": "website-qec",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Landing page và kho bài viết dự án cho CLB QEC kèm backend Express lưu trữ dự án.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "author": "QEC Club",
+  "license": "MIT"
+}
