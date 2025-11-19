@@ -14,6 +14,7 @@ const profileEmail = document.getElementById("profileEmail");
 const profileAvatar = document.getElementById("profileAvatar");
 const themeToggle = document.getElementById("themeToggle");
 const demoLoginBtn = document.getElementById("demoLogin");
+const syncStatus = document.getElementById("syncStatus");
 
 const state = {
   projects: [],
@@ -68,17 +69,30 @@ async function refreshProjects() {
   if (!projectGrid) return;
   state.loadingProjects = true;
   renderProjects();
+  setSyncStatus("Đang đồng bộ dữ liệu...", "loading");
   try {
     const remoteProjects = await fetchProjectsFromApi();
     state.projects = normalizeProjects(remoteProjects);
     saveProjects(state.projects);
+    const now = new Intl.DateTimeFormat("vi-VN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date());
+    setSyncStatus(`Đã đồng bộ lúc ${now}`, "success");
   } catch (error) {
     console.warn("Không thể đồng bộ backend, dùng dữ liệu cache.", error);
     state.projects = loadProjectsFromCache();
+    setSyncStatus("Mất kết nối, đang dùng dữ liệu cache", "error");
   } finally {
     state.loadingProjects = false;
     renderProjects();
   }
+}
+
+function setSyncStatus(message, variant = "idle") {
+  if (!syncStatus) return;
+  syncStatus.textContent = message;
+  syncStatus.dataset.state = variant;
 }
 
 function loadUser() {

@@ -119,11 +119,16 @@
             <h2>Dự án nổi bật</h2>
             <p>Danh sách được cập nhật tự động từ form nội bộ của thành viên.</p>
           </div>
-          <div class="filters">
-            <button class="filter-btn active" data-filter="all">Tất cả</button>
-            <button class="filter-btn" data-filter="web">Web</button>
-            <button class="filter-btn" data-filter="mobile">Mobile</button>
-            <button class="filter-btn" data-filter="ai">AI</button>
+          <div class="projects-toolbar">
+            <div class="filters">
+              <button class="filter-btn active" data-filter="all">Tất cả</button>
+              <button class="filter-btn" data-filter="web">Web</button>
+              <button class="filter-btn" data-filter="mobile">Mobile</button>
+              <button class="filter-btn" data-filter="ai">AI</button>
+            </div>
+            <div class="sync-status" id="syncStatus" aria-live="polite">
+              Đang đồng bộ dữ liệu...
+            </div>
           </div>
         </div>
         <div class="project-grid" id="projectGrid"></div>

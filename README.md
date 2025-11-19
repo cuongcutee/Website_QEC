@@ -1,6 +1,6 @@
 # Website QEC Club
 
-Website landing page dành cho câu lạc bộ (CLB) công nghệ QEC với phần đăng nhập Google, khu vực đăng dự án nội bộ và kho bài viết mô tả chi tiết từng dự án. Mọi nội dung đều là tĩnh nên bạn có thể deploy ở bất kỳ static hosting nào.
+Website landing page dành cho câu lạc bộ (CLB) công nghệ QEC với phần đăng nhập Google, khu vực đăng dự án nội bộ và kho bài viết mô tả chi tiết từng dự án. Frontend được phục vụ từ backend Node.js tự sinh API nên dữ liệu có thể đồng bộ giữa nhiều thành viên thay vì chỉ nằm trên trình duyệt.
 
 ## Tính năng chính
 
@@ -10,8 +10,9 @@ Website landing page dành cho câu lạc bộ (CLB) công nghệ QEC với ph�
 - Form gửi dự án mới, chỉ khả dụng sau khi đăng nhập.
 - Khi bấm "Xem bài viết" trên card dự án bạn sẽ được chuyển tới `projects.html` để đọc hướng dẫn triển khai dạng bài viết, kèm đường dẫn demo/tài liệu.
 - Backend Node.js thuần xử lý API `/api/projects`, lưu trữ dự án vào file JSON và phục vụ toàn bộ static site.
+- Thanh trạng thái đồng bộ cho biết dữ liệu đang được lấy từ backend hay đang dùng cache để tránh hiểu nhầm khi backend tạm thời offline.
 - Chế độ sáng/tối được lưu trong `localStorage`.
-- Mọi dự án được lưu cục bộ (`localStorage`), dữ liệu mẫu sẽ tự khởi tạo lần đầu.
+- Dữ liệu dự án được lưu trên backend, nhưng client vẫn cache bản sao trong `localStorage` để đọc offline và đồng bộ lại khi backend hoạt động.
 
 ## Cấu trúc
 
