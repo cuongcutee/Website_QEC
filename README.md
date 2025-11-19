@@ -23,7 +23,7 @@ Website landing page dành cho câu lạc bộ (CLB) công nghệ QEC với ph�
 ├── app.js            # Logic Google Sign-In, lọc dự án, đồng bộ API
 ├── projects-page.js  # Render bài viết hướng dẫn cho từng dự án
 ├── server.js         # Backend HTTP native, phục vụ static + API dự án
-└── storage/projects.json # File dữ liệu được server cập nhật
+└── storage/             # Sinh tự động khi chạy server, chứa projects.json
 ```
 
 ## Thiết lập Google Sign-In
@@ -42,6 +42,8 @@ npm run dev
 ```
 
 Server sẽ chạy tại `http://localhost:4173`. Mặc định backend cũng phục vụ các file tĩnh nên chỉ cần chạy một lệnh để vừa xem landing (`/`) vừa xem kho bài viết (`/projects.html`).
+
+> Thư mục `storage/` và file `storage/projects.json` được tạo tự động khi backend chạy. Chúng không nằm trong Git để tránh xung đột khi nhiều thành viên cùng phát triển. Nếu muốn reset dữ liệu cục bộ, chỉ cần xoá thư mục này rồi chạy lại `npm run dev` để server seed dữ liệu mẫu mới.
 
 ## API dự án
 
